@@ -10,7 +10,7 @@ import {
 import { PostsService } from './posts.service';
 import { GetAllPostsQueryDto } from './dtos/get-all-posts-query.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { CreatePostDto } from './dtos/create-posts.dto';
+import { CreatePostDto } from './dtos/create-post.dto';
 
 @Controller('posts')
 @ApiTags('Posts')
