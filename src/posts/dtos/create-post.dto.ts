@@ -1,8 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsArray,
   IsEnum,
+  IsInt,
   IsISO8601,
   IsJSON,
   IsNotEmpty,
@@ -10,19 +10,20 @@ import {
   IsString,
   IsUrl,
   Matches,
+  MaxLength,
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { CreatePostMetaOptionsDto } from './create-post-meta-options.dto';
+import { CreatePostMetaOptionsDto } from '../../meta-options/dtos/create-post-meta-options.dto';
 
-enum PostEnum {
+export enum PostTypeEnum {
   POST = 'post',
   PAGE = 'page',
   STORY = 'story',
   SERIES = 'series',
 }
 
-enum StatusEnum {
+export enum PostStatusEnum {
   DRAFT = 'draft',
   SCHEDULED = 'scheduled',
   REVIEW = 'review',
@@ -36,16 +37,17 @@ export class CreatePostDto {
   })
   @IsString()
   @MinLength(4)
+  @MaxLength(512)
   @IsNotEmpty()
   title: string;
 
   @ApiProperty({
-    enum: PostEnum,
+    enum: PostTypeEnum,
     description: "Possible values, 'post','page', 'story', 'series",
   })
-  @IsEnum(PostEnum)
+  @IsEnum(PostTypeEnum)
   @IsNotEmpty()
-  postType: PostEnum;
+  postType: PostTypeEnum;
 
   @ApiProperty({
     description: 'e.g - my-url',
@@ -53,6 +55,7 @@ export class CreatePostDto {
   })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(256)
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
     message:
       "A slug should be all small letters and uses only '-' and without spaces. e.g 'my-url'",
@@ -60,12 +63,12 @@ export class CreatePostDto {
   slug: string;
 
   @ApiProperty({
-    enum: StatusEnum,
+    enum: PostStatusEnum,
     description: "Possible values 'draft', 'scheduled', 'review', 'published'",
   })
-  @IsEnum(StatusEnum)
+  @IsEnum(PostStatusEnum)
   @IsNotEmpty()
-  status: StatusEnum;
+  status: PostStatusEnum;
 
   @ApiProperty({
     description: 'This is the content of the post',
@@ -91,6 +94,7 @@ export class CreatePostDto {
   })
   @IsString()
   @IsOptional()
+  @MaxLength(1024)
   @IsUrl()
   featuredImageUrl?: string;
 
@@ -102,39 +106,35 @@ export class CreatePostDto {
   @IsOptional()
   publishedOn?: Date;
 
+  //TODO: add relationship
   @ApiPropertyOptional({
-    description: 'An array of tags passed as string values',
-    example: ['nestjs', 'typescript'],
+    description: 'An array of tag ids',
+    example: ['1', '2'],
   })
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  @MinLength(3, { each: true })
-  tags?: string[];
+  @IsInt({ each: true })
+  tags?: number[];
 
   @ApiPropertyOptional({
-    type: 'array',
-    required: false,
-    items: {
-      type: 'object',
-      properties: {
-        key: {
-          type: 'string',
-          example: 'sidebarEnabled',
-          description:
-            'The key can be any string identifier for your meta option',
-        },
-        value: {
-          type: 'any',
-          description: 'Any value that you want to save to the key.',
-          example: true,
-        },
+    type: 'object',
+    properties: {
+      metaValue: {
+        type: 'string',
+        example: '{"sidebarEnabled": true}',
       },
     },
   })
   @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
+  @ValidateNested()
   @Type(() => CreatePostMetaOptionsDto)
-  metaOptions?: CreatePostMetaOptionsDto[];
+  metaOptions?: CreatePostMetaOptionsDto;
+
+  @ApiProperty({
+    type: 'integer',
+    required: true,
+    example: 1,
+  })
+  @IsInt()
+  @IsNotEmpty()
+  authorId: number;
 }

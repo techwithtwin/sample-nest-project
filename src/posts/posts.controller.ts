@@ -1,34 +1,36 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
   Patch,
   Post,
-  Query,
 } from '@nestjs/common';
-import { PostsService } from './posts.service';
-import { GetAllPostsQueryDto } from './dtos/get-all-posts-query.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { PatchPostDto } from './dtos/patch-post.dto';
+import { PostsService } from './posts.service';
 
 @Controller('posts')
 @ApiTags('Posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
+  // Get All posts
   @Get()
-  getAllPosts(@Query() getAllPostsQueryDto: GetAllPostsQueryDto) {
-    return this.postsService.getAllPosts(getAllPostsQueryDto);
+  getAllPosts() {
+    return this.postsService.getAllPosts();
   }
 
+  // Get single post
   @Get('/:id')
   getPostById(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.getPostById(id);
   }
 
+  // Create Post
   @ApiOperation({
     summary: 'Creates a new blog post',
   })
@@ -39,9 +41,10 @@ export class PostsController {
   })
   @Post()
   createPost(@Body() createPostDto: CreatePostDto) {
-    return createPostDto;
+    return this.postsService.create(createPostDto);
   }
 
+  // Update post
   @ApiOperation({
     summary: "Update a blog post by it's Id",
   })
@@ -54,7 +57,12 @@ export class PostsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() patchPostDto: PatchPostDto,
   ) {
-    console.log(id);
-    console.log(patchPostDto);
+    return this.postsService.updatePost(id, patchPostDto);
+  }
+
+  // Delete Post with it's metaoptions
+  @Delete('/:id')
+  deletePost(@Param('id', ParseIntPipe) id: number) {
+    return this.postsService.deletePost(id);
   }
 }
