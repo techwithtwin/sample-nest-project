@@ -1,18 +1,17 @@
 import {
   ConflictException,
   forwardRef,
-  HttpException,
-  HttpStatus,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { User } from '../user.entity';
+import { UsersCreateManyProvider } from './users-create-many.provider';
+import { CreateManyUsersDto } from '../dtos/create-many-users.dto';
 
 /**
  * Class to connect to Users table and perform business operations
@@ -26,8 +25,8 @@ export class UsersService {
     // User repo
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    // Config Service
-    private readonly configService: ConfigService,
+    // users createmany provider
+    private readonly usersCreateManyProvider: UsersCreateManyProvider,
   ) {}
 
   async createUser(createUserDto: CreateUserDto) {
@@ -48,6 +47,8 @@ export class UsersService {
    * Get all users from the database and also return the results, based on the limit and page number
    */
   getAllUsers(limit: number, page: number) {
+    console.log('Limit', limit, 'page', page);
+
     return this.usersRepository.find();
   }
 
@@ -60,5 +61,10 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found!');
 
     return user;
+  }
+
+  // create many users
+  async createMany(createUsersDto: CreateManyUsersDto) {
+    return await this.usersCreateManyProvider.createMany(createUsersDto);
   }
 }
