@@ -1,16 +1,17 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Tag } from 'src/tags/tag.entity';
+import { TagsService } from 'src/tags/tags.service';
 import { UsersService } from 'src/users/providers/users.service';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './dtos/create-post.dto';
-import { Post } from './post.entity';
-import { TagsService } from 'src/tags/tags.service';
-import { Tag } from 'src/tags/tag.entity';
 import { PatchPostDto } from './dtos/patch-post.dto';
+import { Post } from './post.entity';
 
 @Injectable()
 export class PostsService {
@@ -73,6 +74,10 @@ export class PostsService {
     let tags: Tag[] = [];
     if (patchPostDto.tags) {
       tags = await this.tagsService.findMultipleTags(patchPostDto.tags);
+
+      if (tags.length !== patchPostDto.tags.length) {
+        throw new BadRequestException('1 or more tags does not exist');
+      }
     }
 
     const existingPost = await this.postsRepo.findOneBy({

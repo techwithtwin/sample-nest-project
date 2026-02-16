@@ -5,13 +5,14 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { User } from '../user.entity';
-import { ConfigService } from '@nestjs/config';
 
 /**
  * Class to connect to Users table and perform business operations
@@ -39,30 +40,25 @@ export class UsersService {
     if (existingUser)
       throw new ConflictException('User with this email already exists!');
 
-    let newUser = this.usersRepository.create(createUserDto);
-    newUser = await this.usersRepository.save(newUser);
-
-    return newUser;
+    const newUser = this.usersRepository.create(createUserDto);
+    return await this.usersRepository.save(newUser);
   }
 
   /**
    * Get all users from the database and also return the results, based on the limit and page number
    */
-  async getAllUsers(limit: number, page: number) {
-    const dbHost = this.configService.get<string>('DB_HOST');
-
-    console.log('DBHOST', dbHost);
-
-    if (!this.authService.isAuthenticated()) {
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-    }
-    return await this.usersRepository.find();
+  getAllUsers(limit: number, page: number) {
+    return this.usersRepository.find();
   }
 
   //Get single user
   async getUserById(userId: number) {
-    return await this.usersRepository.findOneBy({
+    const user = await this.usersRepository.findOneBy({
       id: userId,
     });
+
+    if (!user) throw new NotFoundException('User not found!');
+
+    return user;
   }
 }
