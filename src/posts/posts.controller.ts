@@ -7,11 +7,13 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { PatchPostDto } from './dtos/patch-post.dto';
 import { PostsService } from './posts.service';
+import { GetPostsDto } from './dtos/get-posts.dto';
 
 @Controller('posts')
 @ApiTags('Posts')
@@ -20,8 +22,9 @@ export class PostsController {
 
   // Get All posts
   @Get()
-  getAllPosts() {
-    return this.postsService.getAllPosts();
+  getAllPosts(@Query() postsQuery: GetPostsDto) {
+    console.log('Post Query', postsQuery);
+    return this.postsService.getAllPosts(postsQuery);
   }
 
   // Get single post

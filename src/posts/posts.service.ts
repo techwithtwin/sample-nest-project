@@ -12,6 +12,7 @@ import { Repository } from 'typeorm';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { PatchPostDto } from './dtos/patch-post.dto';
 import { Post } from './post.entity';
+import { GetPostsDto } from './dtos/get-posts.dto';
 
 @Injectable()
 export class PostsService {
@@ -23,13 +24,22 @@ export class PostsService {
   ) {}
 
   // Get All posts
-  getAllPosts() {
+  getAllPosts(postsQuery: GetPostsDto) {
     return this.postsRepo.find({
       relations: {
         metaOptions: true,
         author: true,
         tags: true,
       },
+      select: {
+        tags: {
+          slug: true,
+          id: true,
+          name: true,
+        },
+      },
+      take: postsQuery.limit,
+      skip: (postsQuery.page! - 1) * postsQuery.limit!,
     });
   }
 
