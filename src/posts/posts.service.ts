@@ -13,6 +13,7 @@ import { CreatePostDto } from './dtos/create-post.dto';
 import { PatchPostDto } from './dtos/patch-post.dto';
 import { Post } from './post.entity';
 import { GetPostsDto } from './dtos/get-posts.dto';
+import { PaginationProvider } from 'src/common/pagination/pagination.provider';
 
 @Injectable()
 export class PostsService {
@@ -21,26 +22,21 @@ export class PostsService {
     private readonly postsRepo: Repository<Post>,
     private readonly usersService: UsersService,
     private readonly tagsService: TagsService,
+    // Inject pagination provider
+    private readonly paginationProvider: PaginationProvider,
   ) {}
 
   // Get All posts
-  getAllPosts(postsQuery: GetPostsDto) {
-    return this.postsRepo.find({
-      relations: {
-        metaOptions: true,
-        author: true,
-        tags: true,
+  async getAllPosts(postsQuery: GetPostsDto) {
+    const posts = await this.paginationProvider.paginateQuery(
+      {
+        limit: postsQuery.limit,
+        page: postsQuery.page,
       },
-      select: {
-        tags: {
-          slug: true,
-          id: true,
-          name: true,
-        },
-      },
-      take: postsQuery.limit,
-      skip: (postsQuery.page! - 1) * postsQuery.limit!,
-    });
+      this.postsRepo,
+    );
+
+    return posts;
   }
 
   // Create Post
