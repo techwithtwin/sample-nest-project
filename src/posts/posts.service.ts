@@ -14,6 +14,7 @@ import { PatchPostDto } from './dtos/patch-post.dto';
 import { Post } from './post.entity';
 import { GetPostsDto } from './dtos/get-posts.dto';
 import { PaginationProvider } from 'src/common/pagination/pagination.provider';
+import { PaginatedInterface } from 'src/common/pagination/interfaces/paginated.interface';
 
 @Injectable()
 export class PostsService {
@@ -27,8 +28,10 @@ export class PostsService {
   ) {}
 
   // Get All posts
-  async getAllPosts(postsQuery: GetPostsDto) {
-    const posts = await this.paginationProvider.paginateQuery(
+  async getAllPosts(
+    postsQuery: GetPostsDto,
+  ): Promise<PaginatedInterface<Post>> {
+    const results = await this.paginationProvider.paginateQuery(
       {
         limit: postsQuery.limit,
         page: postsQuery.page,
@@ -36,7 +39,7 @@ export class PostsService {
       this.postsRepo,
     );
 
-    return posts;
+    return results;
   }
 
   // Create Post
