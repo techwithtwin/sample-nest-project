@@ -1,5 +1,5 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -13,6 +13,9 @@ import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import environmentValidation from './config/environment.validation';
 import { PaginationModule } from './common/pagination/pagination.module';
+import { AccessTokenGuard } from './auth/guards/access-token.guard';
+import jwtConfig from './auth/config/jwt.config';
+import { JwtModule } from '@nestjs/jwt';
 
 const ENV = process.env.NODE_ENV;
 
@@ -24,6 +27,8 @@ const ENV = process.env.NODE_ENV;
     TagsModule,
     MetaOptionsModule,
     PaginationModule,
+    ConfigModule.forFeature(jwtConfig),
+    JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: !ENV ? '.env' : `.env.${ENV}`,
@@ -51,6 +56,10 @@ const ENV = process.env.NODE_ENV;
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
     },
   ],
 })

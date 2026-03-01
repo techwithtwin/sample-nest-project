@@ -9,19 +9,18 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateManyUsersDto } from './dtos/create-many-users.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUserParamDto } from './dtos/get-users-param.dto';
 import { PatchUserDto } from './dtos/patch-user.dto';
 import { UsersService } from './providers/users.service';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateManyUsersDto } from './dtos/create-many-users.dto';
 
 @Controller('users')
 @ApiTags('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
   @ApiOperation({
     summary: 'Fetches a list of registered users in the application.',
   })
@@ -44,6 +43,7 @@ export class UsersController {
       'The position of the page number that you want the API to return',
     example: 1,
   })
+  @Get()
   getUsers(
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
