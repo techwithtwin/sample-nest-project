@@ -18,6 +18,7 @@ export class CreateUserProvider {
     @Inject(forwardRef(() => HashingProvider))
     private readonly hashingProvider: HashingProvider,
   ) {}
+
   async createUser(createUserDto: CreateUserDto) {
     const existingUser = await this.usersRepository.findOne({
       where: {
