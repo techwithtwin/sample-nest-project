@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Post } from '../post.entity';
 import { TagsService } from 'src/tags/tags.service';
@@ -14,8 +14,13 @@ export class CreatePostProvider {
 
   async createPost(createPostDto: CreatePostDto, authorId: number) {
     let tags: Tag[] = [];
+
     if (createPostDto.tags) {
       tags = await this.tagsService.findMultipleTags(createPostDto.tags);
+    }
+
+    if (createPostDto.tags?.length !== tags.length) {
+      throw new BadRequestException('Tags Supplied exceeds, tags found!');
     }
 
     const newPost = this.postsRepo.create({
