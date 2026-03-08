@@ -14,7 +14,7 @@ import { ActiveUser } from 'src/auth/decorators/active-user.decorator';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { GetPostsDto } from './dtos/get-posts.dto';
 import { PatchPostDto } from './dtos/patch-post.dto';
-import { PostsService } from './posts.service';
+import { PostsService } from './providers/posts.service';
 
 @Controller('posts')
 @ApiTags('Posts')

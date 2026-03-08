@@ -2,28 +2,26 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginatedInterface } from 'src/common/pagination/interfaces/paginated.interface';
+import { PaginationProvider } from 'src/common/pagination/pagination.provider';
 import { Tag } from 'src/tags/tag.entity';
 import { TagsService } from 'src/tags/tags.service';
-import { UsersService } from 'src/users/providers/users.service';
 import { Repository } from 'typeorm';
-import { CreatePostDto } from './dtos/create-post.dto';
-import { PatchPostDto } from './dtos/patch-post.dto';
-import { Post } from './post.entity';
-import { GetPostsDto } from './dtos/get-posts.dto';
-import { PaginationProvider } from 'src/common/pagination/pagination.provider';
-import { PaginatedInterface } from 'src/common/pagination/interfaces/paginated.interface';
+import { CreatePostDto } from '../dtos/create-post.dto';
+import { GetPostsDto } from '../dtos/get-posts.dto';
+import { Post } from '../post.entity';
+import { CreatePostProvider } from './create-post.provider';
+import { PatchPostDto } from '../dtos/patch-post.dto';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postsRepo: Repository<Post>,
-    private readonly usersService: UsersService,
     private readonly tagsService: TagsService,
-    // Inject pagination provider
+    private readonly createPostProvider: CreatePostProvider,
     private readonly paginationProvider: PaginationProvider,
   ) {}
 
@@ -44,24 +42,7 @@ export class PostsService {
 
   // Create Post
   async create(createPostDto: CreatePostDto, authorId: number) {
-    // Find author from database
-    const author = await this.usersService.getUserById(authorId);
-
-    if (!author) throw new UnauthorizedException();
-
-    // find tags
-    let tags: Tag[] = [];
-    if (createPostDto.tags) {
-      tags = await this.tagsService.findMultipleTags(createPostDto.tags);
-    }
-
-    const newPost = this.postsRepo.create({
-      ...createPostDto,
-      author: author,
-      tags,
-    });
-
-    return await this.postsRepo.save(newPost);
+    return this.createPostProvider.createPost(createPostDto, authorId);
   }
 
   // Get Single post by id
