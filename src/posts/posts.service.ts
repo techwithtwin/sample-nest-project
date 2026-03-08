@@ -43,9 +43,9 @@ export class PostsService {
   }
 
   // Create Post
-  async create(createPostDto: CreatePostDto) {
+  async create(createPostDto: CreatePostDto, authorId: number) {
     // Find author from database
-    const author = await this.usersService.getUserById(createPostDto.authorId);
+    const author = await this.usersService.getUserById(authorId);
 
     if (!author) throw new UnauthorizedException();
 

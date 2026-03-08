@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/providers/users.service';
 import { SignInDto } from '../dtos/signin.dto';
 import { HashingProvider } from './hashing.provider';
+import { ActiveUserData } from '../interfaces/active-user-data.interface';
 
 @Injectable()
 export class SignInProvider {
@@ -32,7 +33,7 @@ export class SignInProvider {
     const accessToken = await this.jwtService.signAsync({
       sub: user.id,
       email: user.email,
-    });
+    } as ActiveUserData);
 
     return {
       accessToken,
