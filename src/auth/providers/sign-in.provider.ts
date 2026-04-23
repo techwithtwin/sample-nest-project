@@ -20,6 +20,10 @@ export class SignInProvider {
   async signIn(signInDto: SignInDto) {
     const user = await this.usersService.findUserByEmail(signInDto.email);
 
+    if (!user.password) {
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+
     const isEqual = await this.hashingProvider.comparePassword(
       signInDto.password,
       user.password,
