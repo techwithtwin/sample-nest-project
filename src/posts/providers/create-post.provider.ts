@@ -4,10 +4,12 @@ import { Post } from '../post.entity';
 import { TagsService } from 'src/tags/tags.service';
 import { Tag } from 'src/tags/tag.entity';
 import { CreatePostDto } from '../dtos/create-post.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CreatePostProvider {
   constructor(
+    @InjectRepository(Post)
     private readonly postsRepo: Repository<Post>,
     private readonly tagsService: TagsService,
   ) {}

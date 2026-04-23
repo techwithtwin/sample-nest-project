@@ -9,12 +9,14 @@ import { BcryptProvider } from './providers/bcrypt.provider';
 import { HashingProvider } from './providers/hashing.provider';
 import { SignInProvider } from './providers/sign-in.provider';
 import { GenerateTokensProvider } from './providers/generate-tokens.provider';
+import { RefreshTokensProvider } from './providers/refresh-tokens.provider';
 
 @Module({
   providers: [
     AuthService,
     SignInProvider,
     GenerateTokensProvider,
+    RefreshTokensProvider,
     {
       provide: HashingProvider,
       useClass: BcryptProvider,
