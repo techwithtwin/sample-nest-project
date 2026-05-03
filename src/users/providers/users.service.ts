@@ -13,6 +13,9 @@ import { User } from '../user.entity';
 import { CreateUserProvider } from './create-user.provider';
 import { UsersCreateManyProvider } from './users-create-many.provider';
 import { FindUserByEmailProvider } from './find-user-by-email.provider';
+import { FindUserByGoogleIdProvider } from './find-user-by-google-id.provider';
+import { CreateGoogleUserProvider } from './create-google-user.provider';
+import { GoogleUser } from '../interfaces/google-user.interface';
 
 /**
  * Class to connect to Users table and perform business operations
@@ -36,6 +39,12 @@ export class UsersService {
 
     // find one user by email
     private readonly findUserByEmailProvider: FindUserByEmailProvider,
+
+    // Find user by google Id
+    private readonly findUserByGoogleIdProvider: FindUserByGoogleIdProvider,
+
+    // Create Google User Provider
+    private readonly createGoogleUserProvider: CreateGoogleUserProvider,
   ) {}
 
   createUser(createUserDto: CreateUserDto) {
@@ -70,5 +79,13 @@ export class UsersService {
   // find user by email
   async findUserByEmail(email: string) {
     return await this.findUserByEmailProvider.findUserByEmail(email);
+  }
+
+  async findUserByGoogleId(googleId: string) {
+    return await this.findUserByGoogleIdProvider.findUserByGoogleId(googleId);
+  }
+
+  async createGoogleUser(googleUser: GoogleUser) {
+    return await this.createGoogleUserProvider.createGoogleUser(googleUser);
   }
 }
