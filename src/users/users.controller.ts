@@ -60,6 +60,7 @@ export class UsersController {
   }
 
   @Post()
+  @Auth(AuthTypeEnum.None)
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);
   }

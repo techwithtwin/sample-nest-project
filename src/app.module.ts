@@ -17,6 +17,7 @@ import { UsersModule } from './users/users.module';
 import { AuthenticationGuard } from './auth/guards/authentication.guard';
 import jwtConfig from './auth/config/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
+import { DataResponseInterceptor } from './common/interceptors/data-response.interceptor';
 
 const ENV = process.env.NODE_ENV;
 
@@ -57,6 +58,10 @@ const ENV = process.env.NODE_ENV;
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DataResponseInterceptor,
     },
     {
       provide: APP_GUARD,
